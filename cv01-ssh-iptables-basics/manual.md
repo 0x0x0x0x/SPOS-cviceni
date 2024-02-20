@@ -1,7 +1,7 @@
 # Cviceni 1
 
 ## Zakladni prikazy
-
+To máme umět ze ZOS.
 ```bash
 ps auxf
 ls | ls -1 | ls -al
@@ -22,12 +22,21 @@ sed | awk
 
 ### Autentizace klici
 
+#### Vytvoření a přidání klíče
 ```bash
 ssh-keygen -t rsa -b 4096 -C "jindra@spos"
-ssh-agent | eval `ssh-agent`
 ssh-add
-ssh-copy-id
-cat ~/.ssh/authorized_keys
+```
+#### Přidání do agenta
+- nemusíme zadávat při každém připojení heslo ke klíči
+- umožňuje přenášet klíče skrz servery
+```bash
+ssh-agent || eval `ssh-agent`
+```
+
+#### Přidání klíče na server
+```bash
+ssh-copy-id user@host
 ```
 ### Authorized keys
 
@@ -46,7 +55,7 @@ ssh user@machine "uname -a"
 ```
 
 ### Nastaveni klienta
-
+- umožňuje přednastavení připojení
 ```
 cat ~/.ssh/config
 
@@ -55,11 +64,15 @@ Host spos
    User root
    Port 22
 ```
+```bash
+ssh spos
+```
 
 ### Zakladni nastaveni serveru
-
-```
-cat /etc/ssh/sshd_config
+- sshd = SSH Daemon
+- nastavení chování serveru
+```bash
+nano /etc/ssh/sshd_config
 
 ...
 AllowUsers root
@@ -67,6 +80,7 @@ PasswordAuthentication no
 PermitRootLogin without-password
 ...
 
+service sshd restart || systemctl restart sshd
 ```
 
 ## Fail2ban
