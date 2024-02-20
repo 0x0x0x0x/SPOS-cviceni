@@ -89,6 +89,17 @@ service sshd restart || systemctl restart sshd
 apt-get install fail2ban
 ```
 
+## Git
+```bash
+cd /etc
+git init .
+git add .
+git commit -am "Prvni cviceni"
+git diff
+git log -p
+```
+
+
 ## Iptables
  
 ```bash
