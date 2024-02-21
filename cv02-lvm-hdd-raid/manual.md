@@ -8,6 +8,7 @@ cat /proc/mdstat
 df -h | df -m | df -i
 du -h | du -hs | du -m
 mount
+#připojí všechno z fstab
 mount -a
 mount /dev/sda1 /mnt/
 fdisk -l /dev/sda
@@ -30,6 +31,18 @@ xfs_grow /dev/sda2
 
 mkswap /dev/sda3
 swapon /dev/sda3
+```
+## Vytvoření virtuálního disku
+```bash
+# vytvoří nový virtuální disk, pokud disk neexistuje
+cfdisk /dev/vdb1
+# vytvoří filesystem
+mkfs.ext4 /dev/vdb1
+# přidáme virtuální disk na seznam připojitelných souborových systémů
+nano /etc/fstab
+	/dev/vdb1	/mnt	ext4	defaults	0	0
+# připojíme virtuální disk
+mount /dev/vdb1
 ```
 
 ## Prace s obrazy

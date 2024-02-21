@@ -23,6 +23,7 @@ sed | awk
 ### Autentizace klici
 
 #### Vytvoření a přidání klíče
+- dobré je nezapomenout zadané heslo jako cvíčící na druhém cvičení nebo nezadávat žádné heslo
 ```bash
 ssh-keygen -t rsa -b 4096 -C "jindra@spos"
 ssh-add
@@ -57,7 +58,7 @@ ssh user@machine "uname -a"
 ### Nastaveni klienta
 - umožňuje přednastavení připojení
 ```
-cat ~/.ssh/config
+nano ~/.ssh/config
 
 Host spos
    HostName 147.228.67.42
@@ -83,12 +84,6 @@ PermitRootLogin without-password
 service sshd restart || systemctl restart sshd
 ```
 
-## Fail2ban
-
-```bash
-apt-get install fail2ban
-```
-
 ## Git
 ```bash
 cd /etc
@@ -99,22 +94,82 @@ git diff
 git log -p
 ```
 
+## Informace o serveru a nastaveni:
+
+```bash
+/etc/
+/etc/resolv.conf
+/etc/hostname
+/etc/network/interfaces
+# připojitelné file systémy, umí i síťové disky
+/etc/fstab
+# statické záznamy DNS
+/etc/hosts
+/etc/passwd
+/etc/group
+# hashe hesel i doba jejich platnosti
+/etc/shadow
+# číslo verze systému
+/etc/debian_version | /etc/redhat-release
+
+# napíše hostname
+hostname
+# změní v runtime hostname na stroj, po restartu ze změní na hodnotu z /etc/hostname
+hostname stroj
+# informace o systému
+uname -a
+# čas od spuštění a průměrná zátěž
+uptime
+# výpis blokových zařízení
+lsblk
+# vypíše všechno aktuálně mountované (třeba i snapy)
+mount || /proc/mounts
+iptables
+ifconfig | route | ip
+dpkg | aptitude
+
+free
+cat /proc/cpuinfo | cat /proc/meminfo
+mount
+netstat -tupln
+crontab -l
+# správci úloh
+top
+htop
+```
 
 ## Iptables
  
 ```bash
 # omezene pristupu na SSH jen z univerzity
+# informace o pravidlech firewallu
 iptables-nvL
+# přidá na konec pravidel následující pravidla (pouze pro runtime)
 iptables -A INPUT -s  147.228.0.0/16  -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22  -j DROP
+# auto policy nastaví pro INPUT na DROP
+iptables -P INPUT DROP
+# konfigurace stavového modulu
+iptables -I INPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -I OUTPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 # ulozeni a obnoveni nastaveni
 iptables-save > /etc/network/iptables
 iptables-restore /etc/network/iptables
 
 # nastaveni po nahozeni interface
-/etc/network/interfaces
+nano /etc/network/interfaces
 	post-up /sbin/iptables-restore /etc/network/iptables
+
+```
+
+## Fail2ban
+
+```bash
+apt-get install fail2ban
+
+cd /etc/fail2ban/
+nano jail.conf
 
 ```
 
@@ -132,33 +187,6 @@ ldd /usr/sbin/sshd | grep libwrap
 # kontrola nastaveni
 tcpdmatch sshd localhost
 tcpdchk
-```
-
-## Informace o serveru a nastaveni:
-
-```bash
-/etc/
-/etc/resolv.conf
-/etc/hostname
-/etc/network/interfaces
-/etc/fstab
-/etc/hosts
-/etc/passwd | /etc/group | /etc/shadow
-/etc/debian_version | /etc/redhat-release
-
-hostname
-uname
-iptables
-ifconfig | route | ip
-dpkg | aptitude
-
-free
-cat /proc/cpuinfo | cat /proc/meminfo
-mount
-netstat -tupln
-crontab -l
-top
-htop
 ```
 
 ## Sprava sluzeb
