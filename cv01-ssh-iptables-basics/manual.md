@@ -143,14 +143,14 @@ htop
 ```bash
 # omezene pristupu na SSH jen z univerzity
 # informace o pravidlech firewallu
-iptables-nvL
+iptables -nvL
 # přidá na konec pravidel následující pravidla (pouze pro runtime)
 iptables -A INPUT -s  147.228.0.0/16  -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22  -j DROP
 # auto policy nastaví pro INPUT na DROP
 iptables -P INPUT DROP
 # konfigurace stavového modulu
-iptables -I INPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -I OUTPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 # ulozeni a obnoveni nastaveni
