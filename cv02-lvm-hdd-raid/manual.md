@@ -38,7 +38,7 @@ swapon /dev/sda3
 ## Vytvoření virtuálního disku
 ```bash
 # vytvoří nový virtuální disk, pokud disk neexistuje
-cfdisk /dev/vdb1
+cfdisk /dev/vdb
 # vytvoří filesystem
 mkfs.ext4 /dev/vdb1
 # přidáme virtuální disk na seznam připojitelných souborových systémů
