@@ -84,6 +84,12 @@ PermitRootLogin without-password
 service sshd restart || systemctl restart sshd
 ```
 
+## Úkol, který jsme neměli, ale cvičící to popírá
+- změna hesla roota
+```bash
+passwd root
+```
+
 ## Git
 ```bash
 cd /etc

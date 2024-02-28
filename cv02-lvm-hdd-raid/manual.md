@@ -5,6 +5,7 @@
 ```bash
 cat /proc/partitions
 cat /proc/mdstat
+# velikosti fs
 df -h | df -m | df -i
 du -h | du -hs | du -m
 mount
@@ -26,12 +27,14 @@ mkfs.ext4 /dev/sda1
 mkfs.xfs /dev/sda2
 mount /dev/sda2 /mnt/
 
+# resize fs na velikost oblasti
 resize2fs /dev/sda1
 xfs_grow /dev/sda2
 
 mkswap /dev/sda3
 swapon /dev/sda3
 ```
+
 ## Vytvoření virtuálního disku
 ```bash
 # vytvoří nový virtuální disk, pokud disk neexistuje
@@ -43,6 +46,17 @@ nano /etc/fstab
 	/dev/vdb1	/mnt	ext4	defaults	0	0
 # připojíme virtuální disk
 mount /dev/vdb1
+```
+
+## Random věci z cvičení
+- ani cvičící nerozumí tomu, co vyváděl
+- nějaká magie na resize, která asi ani nic nedělá
+```bash
+kpartx -usf /dev/vdb
+kpartx -a /dev/vdb
+kpartx -l /dev/vdb
+kpartx -d /dev/vdb
+lsblk
 ```
 
 ## Prace s obrazy
