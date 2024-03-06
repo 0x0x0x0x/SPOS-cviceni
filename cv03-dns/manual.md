@@ -6,12 +6,13 @@
 # nastroj host
 $ host zcu.cz
 $ host -t NS zcu.cz
-$ host -t MX zcu.cz localhost
+$ host -t MX zcu.cz 8.8.8.8
 
 # nastroj dig
 $ dig zcu.cz
 $ dig -t AAAA zcu.cz
-$ dig -t SOA zcu.cz @localhost
+$ dig -t SOA zcu.cz @8.8.8.8
+$ dig -t TXT zcu.cz @8.8.8.8
 
 # dalsi nastroje
 $ nslookup
@@ -70,6 +71,8 @@ zone "lubos.spos." in {
 ### Zonovy soubor
 
 ```
+nano /etc/bind/db.jindra.spos
+
 $TTL    604800
 @   IN  SOA jindra.spos. root.localhost. (
 

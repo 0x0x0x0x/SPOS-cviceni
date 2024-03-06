@@ -128,7 +128,9 @@ dd if=/dev/zero of=/dev/vdb bs=1M count=1
 lvs
 vgs
 pvs
+```
 
+```bash
 pvdisplay | pvscan | pvremove 
 pvcreate /dev/md0
 pvmove -v /dev/sda2 /dev/sdb2
@@ -171,11 +173,34 @@ raid60 - raid6 + raid0
 ### Sprava RAIDu
 
 ```bash
+# 
 apt install mdadm
 mdadm --create --verbose /dev/md0 --level=1 --raid-devices=2 \
 	/dev/sda1 /dev/sdb1
 
-mdadm -Cv /dev/md0 -l1 -n2 /dev/sd[ab]1
+# zrcadlení mezi dvěma virtuálními disky
+mdadm -Cv /dev/md0 -l1 -n2 /dev/vd[bc]1
+mdadm -Cv /dev/md1 -l5 -n3 /dev/vd[bc]2 missing
+
+pvcreate /dev/md0
+pvcreate /dev/md1
+vgcreate data /dev/md[01]
+lvcreate -L 1G -n mysql data
+
+dd if=/dev/zero of=/loop-520MB bs=1M count=530
+losetup -f /loop-520MB
+mdadm --add /dev/md1 /dev/loop0
+
+mdadm --remove /dev/md1 /dev/loop0
+mdadm --fail /dev/md1 /dev/vdb
+# zotavení
+lvchange -a n /dev/data/mysql
+mdadm --stop /dev/md1
+mdadm -A /dev/md1 /dev/vdb2 /dev/vdc2 /dev/loop0
+lvchange -a y /dev/data/mysql
+
+
+
 
 mdadm -Cv /dev/md1 -l5  -n5 /dev/sda1 /dev/sdb1 /dev/sdc1 \
 	/dev/sdd1 /dev/sde1
@@ -190,18 +215,29 @@ mdadm --remove /dev/md0 /dev/sda1
 mdadm --add /dev/md0 /dev/sdc1
 
 mdadm /dev/md0 --fail /dev/sda1 --remove /dev/sda1 --add /dev/sdc1
-
- mdadm --add/dev/md0 /dev/sdc1
+ # přidá další disk k poli
+ mdadm --add /dev/md0 /dev/sdc1
+ # rozroste pole na počet disků
  mdadm --grow /dev/md0 -n3
 
+# aktivní raidy
 cat /proc/mdstat
 mdadm --detail /dev/md0
 
 watch --interval=10 cat /proc/mdstat
 
+lvremove /dev/data/mysql
+vgremove data
+pvremove /dev/md0
+
 mdadm --stop /dev/md0
 mdadm --remove /dev/md0
 
-mdadm --zero-superblock /dev/sda
+mdadm --zero-superblock /dev/vdb1
+
+# odstranění loop
+losetup -l
+losetup -d /dev/loop0
+rm /loop-520MB
 
 ```
