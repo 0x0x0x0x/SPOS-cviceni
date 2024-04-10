@@ -11,6 +11,9 @@ apt-get install mariadb-server
 /etc/init.d/mysql start|stop|restart
 /etc/mysql/
 /var/lib/mysql
+
+ALTER user 'root'@'localhost' IDENTIFIED BY 'heslo';
+
 ```
 
 ### Pripojeni a zakladni informace
@@ -25,18 +28,19 @@ SHOW CREATE TABLE tabulka\G
 ```
 
 ### Nastaveni klienta
-
+nano ~/.my.cnf
 ```
-cat ~/.my.cnf
 [client]
-user=db01
-password=password
+user=root
+password=heslo
+database=mysql
+host=127.0.0.1
 ```
 
 ### Zaloha a administrace
 
 ```bash
-mysqldump 
+mysqldump mysql user > users.sql
 mysqladmin
 rsync -rav /var/lib/mysql/ /srv/zaloha-mysql/
 ```
@@ -53,17 +57,17 @@ CREATE TABLE table01(
    lastname VARCHAR(30) NOT NULL,
    email VARCHAR(50),
    reg_date TIMESTAMP
-)
+);
 ```
 
 ### PHP Example
-
+apt install php-mysql
 ```php
 <?php
 $servername = "localhost";
-$username = "username";
+$username = "db01";
 $password = "password";
-$dbname = "myDB";
+$dbname = "db01";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -72,7 +76,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "SELECT id, firstname, lastname FROM MyGuests";
+$sql = "SELECT id, firstname, lastname FROM table01";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -102,7 +106,7 @@ pg_hba.conf
 ### Pripojeni a zakladni informace
 
 ```bash
-psql -U root databaze
+psql
 \l
 \c databaze
 \dt 
@@ -133,6 +137,7 @@ createdb
 CREATE USER db01 WITH PASSWORD 'pasword';
 CREATE DATABASE db01 WITH OWNER=db01;
 GRANT ALL PRIVILEGES ON DATABASE db01 to db01;
+use db01;
 CREATE TABLE table01(
    id SERIAL PRIMARY KEY,
    firstname VARCHAR(30) NOT NULL,

@@ -9,6 +9,8 @@ apt-get install apache2
 ### Nastaveni
 
 ```bash
+cd /etc/apache2
+
 a2enmod | a2dismod
 a2ensite | a2dissite
 
@@ -33,7 +35,75 @@ apachectl -t | apachectl -S
 
 ### Virtualni server
 
-```
+```bash
+cd /etc/apache2/sites-avaible/
+cp 000-default.conf akriz.zcu.spos.conf
+nano akriz.zcu.spos.conf
+
+<VirtualHost *:80>
+        # The ServerName directive sets the request scheme, hostname and port that
+        # the server uses to identify itself. This is used when creating
+        # redirection URLs. In the context of virtual hosts, the ServerName
+        # specifies what hostname must appear in the request's Host: header to
+        # match this virtual host. For the default virtual host (this file) this
+        # value is not decisive as it is used as a last resort host regardless.
+        # However, you must set it for any further virtual host explicitly.
+        ServerName akriz.zcu.spos
+        ServerAlias www.akriz.zcu.spos
+
+        ServerAdmin webmaster@akriz.zcu.spos
+        DocumentRoot /var/www/akriz.zcu.spos
+
+        # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+        # error, crit, alert, emerg.
+        # It is also possible to configure the loglevel for particular
+        # modules, e.g.
+        #LogLevel info ssl:warn
+
+        ErrorLog ${APACHE_LOG_DIR}/akriz.zcu.spos.error.log
+        CustomLog ${APACHE_LOG_DIR}/akriz.zcu.spos.access.log combined
+
+        # For most configuration files from conf-available/, which are
+        # enabled or disabled at a global level, it is possible to
+        # include a line for only one particular virtual host. For example the
+        # following line enables the CGI configuration for this host only
+        # after it has been globally disabled with "a2disconf".
+        #Include conf-available/serve-cgi-bin.conf
+</VirtualHost>
+
+mkdir -p /var/www/akriz.zcu.spos
+echo "akriz.zcu.spos" > /var/www/akriz.zcu.spos/index.html
+a2ensite akriz.zcu.spos
+# kontrola syntaxe
+apachectl -t
+apachectl -S
+# restart
+systemctl restart apache2
+# test
+curl -H 'Host: akriz.zcu.spos' http://localhost
+curl -H 'Host: www.akriz.zcu.spos' http://localhost
+
+nano /etc/hosts
+127.0.0.1 akriz.zcu.spos www.akriz.zcu.cz
+curl -v www.akriz.zcu.spos
+
+a2enmod ssl
+a2ensite default-ssl
+
+cd sites-enabled/
+cp default-ssl.conf  akriz.zcu.spos.conf
+nano akriz.zcu.spos.conf
+...
+ServerAdmin webmaster@localhost
+ServerName akriz.zcu.spos
+ServerAlias www.akriz.zcu.spos
+DocumentRoot /var/www/akriz.zcu.spos
+...
+systemctl restart apache2
+curl -v -k https://akriz.zcu.spos
+
+
+// ukázka komplexního nastavení
 <VirtualHost *:80>
         ServerAdmin admin@jindra.spos
         ServerName www.jindra.spos
@@ -78,13 +148,23 @@ apachectl -t | apachectl -S
 </VirtualHost>
 ```
 
+## Dehydrated
+```bash
+nano /etc/dehydrated/domains.txt
+ ...
+ CONTACT_EMAIL=akriz@students.zcu.cz
+
+
+```
+
 ## PHP 5/7
 
 ```bash
-apt-get install libapache2-mod-php5
+apt-get install libapache2-mod-php
 
-/etc/php5/apache2
-/etc/php5/cli
+#/etc/php5/apache2
+/etc/php/7.4/apache2/php.ini
+#/etc/php5/cli
 ```
 
 ### Nastaveni
@@ -135,6 +215,7 @@ php_admin_value session.save_path /var/www/www.jindra.spos/phptmp
     fclose($xfile);
 ?>
 ```
+
 
 ### HTTPS/ SSL
 

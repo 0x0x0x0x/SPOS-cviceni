@@ -5,14 +5,19 @@
 ```bash
 # nastroj host
 $ host zcu.cz
+# konkrétní typ záznamu
 $ host -t NS zcu.cz
+# kontrétní typ záznamu od konkrétního DNS serveru
 $ host -t MX zcu.cz 8.8.8.8
+
+# Typy záznamů:
+# SOA, A, AAAA, MX, NS, CNAME, ALIAS, TXT
 
 # nastroj dig
 $ dig zcu.cz
 $ dig -t AAAA zcu.cz
 $ dig -t SOA zcu.cz @8.8.8.8
-$ dig -t TXT zcu.cz @8.8.8.8
+$ dig -t TXT zcu.cz @localhost
 
 # dalsi nastroje
 $ nslookup
@@ -45,8 +50,10 @@ service bind9 start|stop|restart
 ```
 
 ### Naslouchani
+- nedělali jsme
 
 ``` bash
+# rekurzivně se ptá podle úrovní domény
 allow-recursion {10.0.0.0/24;};
 listen-on {127.0.0.1;}; 
 listen-on-v6 {::1;};
@@ -55,17 +62,36 @@ listen-on-v6 {::1;};
 ### Nastaveni zon
 
 ```
+nano /etc/bind/named.conf.local
+
 zone "jindra.spos." in {
     type master;
     file "/etc/bind/db.jindra.spos";
     allow-transfer {147.228.67.0/24;};
 };
 
-zone "lubos.spos." in {
-    type slave;
-    file "/etc/bind/slave/slave.lubos.spos";
-    masters {147.228.67.41;};
+zone "branch.jidnra.zcu.spos" {
+  type master
+  file ...
 };
+
+//moje nastavení:
+zone "akriz.zcu.spos." in {
+        type master;
+        file "/etc/bind/db.akriz.zcu.spos";
+        allow-transfer {147.228.67.0/24;};
+};
+
+zone "ruzickak.zcu.spos" {
+        type slave;
+        file "/etc/bind/slave/db.ruzickak.zcu.spos";
+        masters {147.228.67.45;};
+};
+```
+
+```bash
+mkdir slave; chown bind:bind slave; chmod 770 slave
+service bind9 restart
 ```
 
 ### Zonovy soubor
@@ -108,6 +134,7 @@ acl local {
 ```
 
 ```
+// používání view znamená, že i zóny musí být obaleny ve view
 view "localnetwork" {
  match-clients { local; 192.168.0.0/24; }; 
   recursion yes;
