@@ -1,0 +1,26 @@
+dlouho trvá: postgres
+
+ssh-keygen
+ssh-copy-id root@host
+
+mysql-server -> mariadb-server
+
+nginx with php config - https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/Nginx-PHP-FPM-config-example
+
+
+přesměrování nginx
+server {
+        listen 80;
+        server_name www.jindra.spos;
+
+        location / {
+                proxy_pass http://backend;
+                #include proxy.include;
+        }
+        location /images {
+                root /var/www/images;
+        }
+}
+
+
+samba - nezadávat force user, force group
