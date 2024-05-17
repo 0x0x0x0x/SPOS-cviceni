@@ -39,6 +39,7 @@ Nastaveni a aliasy
 newaliases
 
 /etc/postfix/main.cf:
+mydestination = $myhostname, spos-04.kiv.zcu.cz, localhost, localhost.localdomain, localhost
 home_mailbox = Maildir/
 mailbox_command =
 ```
@@ -115,6 +116,8 @@ Konfiguracni soubory
 jindra2.spos	OK
 jindra3.spos	OK
 
+postmap /etc/postfix/virtual_domains
+
 /etc/postfix/virtual
 info@jindra2.spos	jindra
 info@jindra3.spos	pepa
@@ -124,7 +127,7 @@ Kompletni virtualni hosting
 
 ```bash
 /etc/postfix/main.cf
-virtual_mailbox_domains_maps = hash:/etc/postfix/vmailbox_domains
+virtual_mailbox_domains = hash:/etc/postfix/vmailbox_domains
 virtual_mailbox_maps = hash:/etc/postfix/vmailbox
 virtual_mailbox_base = /home/vmail/vhosts
 virtual_minimum_uid = 100
@@ -162,6 +165,9 @@ catchall@jindra4.spos:{plain}heslo:5000:5000::
 /etc/postfix/master.cf
 dovecot   unix  -       n       n       -       -       pipe
   flags=DRhu user=vmail:vmail argv=/usr/lib/dovecot/deliver -f ${sender} -d ${recipient}
+
+
+postmap /etc/postfix/virtual
 
 /etc/dovecot/conf.d/10-auth.conf
 #!include auth-system.conf.ext

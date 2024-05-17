@@ -41,33 +41,32 @@ docker push path/to/image:newtag
 **Dockerfile**
 
 ```dockerfile
-FROM debian:buster-slim
+FROM debian:11
 
-RUN apt update && \
-    apt install -y netcat && \
-    apt autoremove && \
-    apt autoremove -y && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists
+RUN apt update && apt install -y nginx
 
-COPY netcat.sh /usr/local/bin/
+COPY ./index.html /var/www/html/
 
-CMD ["/bin/bash", "-lc", "netcat.sh"]
-```
+RUN echo "Ahoj svete"
 
-**netcat.sh**
-
-```bash
-#!/bin/bash
-
-echo "Ahoj z dockeru"
-[ -e /bin/nc ] && echo "Mame netcat" || echo "Nemame netcat"
+ENTRYPOINT ["/usr/sbin/nginx"]
 
 ```
 
+**index.html**
+
 ```bash
+DOCKER
+```
+
+```bash
+docker build -t nginx:my -f Dockerfile .
 docker images
-docker rmi  path/to/image:tag
+docker tag nginx:my nginx:spos
+docker run --rm -p 8181:80 nginx:my
+curl 127.0.0.1:8181
+# mapuje pwd na /var/www/html
+docker run --name mynginx --rm -v $PWD:/var/www/html -p 8181:80 nginx:my
 ```
 
 # Triky
@@ -81,23 +80,30 @@ docker ps -a | awk '{print $1}' | xargs docker rm
 
 ### Compose
 
+```bash
+nano docker-compose.yaml
+docker compose up -d
+docker compose ps
+psql postgresql://postgres:heslo@127.0.0.1:15432/template1
+docker compose down
 ```
-version: "3"
+
+```
 services:
-  app:
-    image: path/to/image
-    build:
-      dockerfile: Dockerfile
-      context: .
-    volumes:
-      - .:/app
+  nginx:
+    image: nginx:latest
     ports:
-      - 8080:3000
+      - 8181:80
+    volumes:
+      - ./:/usr/share/nginx/html/
+  postgres:
+    image: postgres:15
     environment:
-      BSA: false
-      SPOS: true
-      CONFIG: /app/config.yml
-    restart: always
+      POSTGRES_PASSWORD: heslo
+    volumes:
+      - ./dtata:/var/lib/postgresql
+    ports:
+      - 15432:5432
   redis:
     image: redis:latest
 ```

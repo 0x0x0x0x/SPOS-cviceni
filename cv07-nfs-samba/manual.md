@@ -3,13 +3,16 @@
 ## NFS
 
 Instalace
-
+ - jedno z nasledujicich
 ```bash
 apt -get install nfs-kernel-server
 apt-get install nfs-server
 ```
 
 Nastaveni
+```bash
+ip a a 10.228.67.44/24 dev ens18
+```
 
 ```bash
 /etc/exports:
@@ -30,8 +33,9 @@ exportfs -u
 Pripojeni
 
 ```bash
-mount -t nfs  10.228.67.42:/srv/share1 /mnt/share1
-mount -t nfs  -o ro 10.228.67.42:/srv/share1 /mnt/share1
+mkdir /mnt/share{1,2,3}
+mount -t nfs  10.228.67.44:/srv/share1 /mnt/share1
+mount -t nfs  -o ro 10.228.67.44:/srv/share1 /mnt/share1
 
 /etc/fstab
 ```
@@ -40,7 +44,7 @@ Mapovani
 
 ```bash
 addgroup --gid 6000 nfs
-addgroup --gid 6000 --uid 6000 nfs
+adduser --gid 6000 --uid 6000 nfs
 ```
 
 ## Samba
@@ -97,10 +101,15 @@ netbios name = debiansecurity = user
 [anonymous]
         path = /srv/anonymous
         force group = cifs
-        create mask = 0660        directory mask = 0771        browsable =yes
+        create mask = 0660        
+        directory mask = 0771        
+        browsable =yes
         writable = yes
         guest ok = yes
 
+systemctl restart smbd
+addgroup users
+usermod -a -G users tonda
 ```
 
 Pripojeni

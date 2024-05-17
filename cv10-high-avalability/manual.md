@@ -5,19 +5,29 @@
 Vice stejnych A zaznamu
 
 ```
+nano db.akriz.zcu.spos
+
 www	IN	A	147.228.67.42
 www	IN	A	147.228.67.43
 www	IN	A	147.228.67.44
+
+service bind9 restart
+host www.akriz.zcu.spos 127.0.0.1
 ```
 
 ## Rsync
 
 ```
-rsync -rav /var/www/jindra.spos  host2:/var/www/jindra.spos
+ip a a 10.0.0.44/32 dev ens18
+ip a a 10.0.1.44/32 dev ens18
+ip a a 10.0.2.44/32 dev ens18
+ip a a 10.0.3.44/32 dev ens18
+
+rsync -rav /var/www/jindra.spos  /var/www/jindra.spos
 ```
 
 ## Pound
-
+nepoužívá se - přeskočeno :(
 ```
 apt-get install pound
 ```
@@ -51,6 +61,11 @@ apt-get install nginx
 ```
 
 ```
+nano /etc/apache2/ports.conf
+na 8080 a 8443
+
+
+
 #/etc/nginx/sites-available/lb.conf
 
 upstream backend  {
